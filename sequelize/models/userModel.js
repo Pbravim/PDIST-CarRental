@@ -5,9 +5,8 @@ export default (sequelize) => {
 
     User.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true,
         },
         nome: {
             type: DataTypes.STRING(100),
@@ -25,6 +24,18 @@ export default (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        email: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        }
     }, {
         sequelize,
         modelName: 'User',

@@ -1,3 +1,3 @@
 import App from './app.js';
 
-App.start(3000);
+App.start(3050);
