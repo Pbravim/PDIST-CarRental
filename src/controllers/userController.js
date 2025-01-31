@@ -32,7 +32,27 @@ export default class UserController {
     async createUser(req, res) {
         try {
             const userData = req.body;
+
+            // Microserviço a comunicação é feita no back ou no front ?
+            // const auth = await fetch ("http://localhost:3051/v1/auth/register", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json"
+            //     },
+            //     body: JSON.stringify({
+            //         login: userData.email,
+            //         passwordHash: userData.password
+            //     })
+            // })
+            
+            // if (!auth){
+            //     return res.status(500).json({ error: "Erro ao criar usuário" });
+            // } 
+
+            // userData.id = auth.id
+
             const newUser = await this.userService.createUser(userData);
+
             return res.status(201).json(newUser);
         } catch (error) {
             return res.status(500).json({ error: error.message });
