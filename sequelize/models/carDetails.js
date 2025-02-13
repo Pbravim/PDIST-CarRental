@@ -22,11 +22,11 @@ export default (sequelize) => {
             },
             cylinders: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             },
             displacement: {
             type: DataTypes.FLOAT,
-            allowNull: false,
+            allowNull: true,
             },
             drive: {
             type: DataTypes.STRING(50),

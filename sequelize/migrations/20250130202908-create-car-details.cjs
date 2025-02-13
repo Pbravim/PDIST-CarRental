@@ -22,11 +22,11 @@ module.exports = {
         type: Sequelize.STRING(50),
       },
       cylinders: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER,
       },
       displacement: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.FLOAT,
       },
       drive: {
