@@ -1,60 +1,85 @@
 import { Op } from "sequelize";
 import CarDetailsService from "../services/carDetailsService.js";
 
-
-
 export default class CarDetailsController {
-    constructor() {
-        this.carDetailsService = new CarDetailsService();   
-        
+  constructor() {
+    this.carDetailsService = new CarDetailsService();
+    this.updateAvailability = this.updateAvailability.bind(this);
+  }
+
+  async findAll(req, res) {
+    try {
+      const { make, model, year, fuel_type, available } = req.query;
+
+      const options = { where: {} };
+
+      if (make) options.where.make = { [Op.iLike]: `${make}%` };
+      if (model) options.where.model = { [Op.iLike]: `${model}%` };
+      if (year) options.where.year = Number(year);
+      if (fuel_type) options.where.fuel_type = fuel_type;
+      if (available !== undefined)
+        options.where.available = available === "true";
+
+      console.log(options);
+
+      const carDetails = await this.carDetailsService.findAll(options);
+
+      if (carDetails.length === 0) {
+        return res.status(404).json({ message: "Nenhum carro encontrado" });
+      }
+
+      res.status(200).json(carDetails);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erro ao buscar os carros" });
     }
+  }
 
-    async findAll(req, res) {
-        try {
-            const { make, model, year, fuel_type } = req.query;
-            
-            const options = { where: {} };
-    
-            if (make) options.where.make = {[Op.iLike]: `${make}%`};
-            if (model) options.where.model = {[Op.iLike]: `${model}%`};
-            if (year) options.where.year = Number(year);
-            if (fuel_type) options.where.fuel_type = fuel_type;
-            
-            console.log(options)
+  async findById(req, res) {
+    try {
+      const { id } = req.params;
 
-            const carDetails = await this.carDetailsService.findAll(options);
+      const options = {};
 
-            if (carDetails.length === 0) {
-                return res.status(404).json({ message: "Nenhum carro encontrado" });
-            }
-    
-            res.status(200).json(carDetails);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Erro ao buscar os carros" });
-        }
+      const carDetails = await this.carDetailsService.findById(id, options);
+
+      if (!carDetails) {
+        return res.status(404).json({ message: "Carro não encontrado" });
+      }
+
+      res.status(200).json(carDetails);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erro ao buscar os detalhes do carro" });
     }
-        
-    
+  }
 
-    async findById(req, res) {
-        try {
-            const { id } = req.params;
-            
-            const options = {}
+  async updateAvailability(req, res) {
+    try {
+      const { id } = req.params;
+      const { available } = req.body;
 
-            const carDetails = await this.carDetailsService.findById(id, options);
+      if (available === undefined) {
+        return res.status(400).json({
+          message: "'available' é obrigatório no corpo da requisição",
+        });
+      }
 
-            if (!carDetails) {
-                return res.status(404).json({ message: "Carro não encontrado" });
-            }
-    
-            res.status(200).json(carDetails);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Erro ao buscar os detalhes do carro" });
-        }
+      const updatedCar = await this.carDetailsService.updateAvailability(
+        id,
+        available
+      );
+
+      console.log(this); // Verifique se 'this' é a instância da classe
+
+      this.carDetailsService.updateAvailability(id, available); // Verifique se está correto
+
+      res.status(200).json(updatedCar);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Erro ao atualizar a disponibilidade do carro" });
     }
-
-
-}
+  }
+} 

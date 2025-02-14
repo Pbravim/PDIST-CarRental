@@ -6,6 +6,7 @@ const carDetailsController = new CarDetailsController();
 
 router.get('/', (req, res) => carDetailsController.findAll(req, res));
 router.get('/:id', (req, res) => carDetailsController.findById(req, res));
+router.patch("/:id", (req, res) => carDetailsController.updateAvailability(req, res));
 
 // router.post('/', carDetailsController.create);
 // router.put('/:id', carDetailsController.update);
