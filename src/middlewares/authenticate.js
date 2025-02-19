@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import HttpError from '../../../utils/customErrors/httpError.js';
 
 dotenv.config();
 
@@ -9,7 +8,7 @@ dotenv.config();
             const authHeader = req.headers.authorization.split(' ');
 
             if (!/^Bearer$/i.test(authHeader[0])) {
-                throw new HttpError(401, 'Invalid token');
+                throw new Error('Invalid token');
             }
 
             const token = authHeader[1];
@@ -17,7 +16,7 @@ dotenv.config();
 
             return tokenDecoded;
         } else {
-            throw new HttpError(401, 'Invalid token');
+            throw new Error('Invalid token');
         }
     }
 
