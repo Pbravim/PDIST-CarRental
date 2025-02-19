@@ -1,3 +1,5 @@
 import App from './app.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-App.start(3050);
+App.start(Number(process.env.PORT) || 3052);

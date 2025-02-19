@@ -33,9 +33,7 @@ export default class UserController {
         let authData
         try {
             const userData = req.body;
-
-            // Microserviço a comunicação é feita no back ou no front ?
-            const response = await fetch ("http://localhost:3051/v1/auth/register", {
+            const response = await fetch ("http://localhost:3051/api2/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -45,24 +43,20 @@ export default class UserController {
                     password: userData.password
                 })
             })
-            
-            // if (!response.ok) {
-            //     return res.status(500).json({ error: "Erro ao criar usuário" });
-            // } 
 
+            if (!response.ok) {
+                throw new Error( "Erro ao criar o usuário" );
+            } 
             authData = await response.json();
-
             userData.id = authData.auth.id
             const newUser = await this.userService.createUser(userData);
-
             return res.status(201).json(newUser);
         } catch (error) {
             if (authData) {
-                await fetch(`http://localhost:3051/v1/auth/delete/${authData.id}`, {
+                await fetch(`http://localhost:3051/api2/auth/gateway/${authData.auth.id}`, {
                     method: "DELETE"
                 })
             }
-            console.log(error)
             return res.status(500).json({ error: error.message });
         }
     }
