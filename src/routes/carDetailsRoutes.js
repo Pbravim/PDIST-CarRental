@@ -9,6 +9,9 @@ router.get("/:id", (req, res) => carDetailsController.findById(req, res));
 router.patch("/:id", (req, res) =>
   carDetailsController.updateAvailability(req, res)
 );
+router.get("/reserved-cars", (req, res) =>
+  carDetailsController.getReservedCars(req, res)
+);
 
 // router.post('/', carDetailsController.create);
 // router.put('/:id', carDetailsController.update);

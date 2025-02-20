@@ -79,7 +79,6 @@ export default class CarDetailsController {
         return res.status(404).json({ message: "Carro não encontrado" });
       }
 
-      
       const updatedCar = await this.carDetailsService.updateAvailability(
         id,
         available,
@@ -92,6 +91,46 @@ export default class CarDetailsController {
       res
         .status(500)
         .json({ message: "Erro ao atualizar a disponibilidade do carro" });
+    }
+  }
+
+  async getReservedCars(req, res) {
+    try {
+      const userId = req.headers.userid;
+
+      if (!userId) {
+        return res.status(403).json({ message: "Usuário não autenticado" });
+      }
+
+      console.log(userId)
+
+      
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      
+      const reservedCars = await this.carDetailsRepository.findAll({
+        where: { userId: userId },
+      });
+
+      
+      if (reservedCars.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Nenhum carro reservado encontrado" });
+      }
+
+      return res.status(200).json(reservedCars);
+    } catch (error) {
+      console.error("Erro ao obter carros reservados:", error);
+      return res
+        .status(500)
+        .json({ message: "Erro ao recuperar carros reservados" });
     }
   }
 }
