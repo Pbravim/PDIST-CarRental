@@ -1,12 +1,14 @@
-import express from 'express';
-import CarDetailsController from '../controllers/carDetailsController.js';
-import { authenticate } from '../middlewares/authenticate.js';
+import express from "express";
+import CarDetailsController from "../controllers/carDetailsController.js";
 
 const router = express.Router();
 const carDetailsController = new CarDetailsController();
 
-router.get('/', authenticate, (req, res) => carDetailsController.findAll(req, res));
-router.get('/:id', authenticate, (req, res) => carDetailsController.findById(req, res));
+router.get("/", (req, res) => carDetailsController.findAll(req, res));
+router.get("/:id", (req, res) => carDetailsController.findById(req, res));
+router.patch("/:id", (req, res) =>
+  carDetailsController.updateAvailability(req, res)
+);
 
 // router.post('/', carDetailsController.create);
 // router.put('/:id', carDetailsController.update);
