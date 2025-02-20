@@ -4,7 +4,6 @@ import CarDetailsService from "../services/carDetailsService.js";
 export default class CarDetailsController {
   constructor() {
     this.carDetailsService = new CarDetailsService();
-    this.updateAvailability = this.updateAvailability.bind(this);
   }
 
   async findAll(req, res) {
@@ -54,23 +53,16 @@ export default class CarDetailsController {
     }
   }
 
-  async updateAvailability(req, res) {
+  async rentCar(req, res) {
     try {
       const { id } = req.params;
-      const { available } = req.body;
 
-      if (available === undefined) {
-        return res.status(400).json({
-          message: "'available' é obrigatório no corpo da requisição",
-        });
-      }
-
-      const userId = req.headers.userid;
+      const userId = req.userInfo.id;
 
       if (!userId) {
         return res
           .status(403)
-          .json({ message: "userId não encontrado nos headers" });
+          .json({ message: "user não encontrado nos headers" });
       }
 
       const car = await this.carDetailsService.findById(id);
@@ -81,8 +73,74 @@ export default class CarDetailsController {
 
       const updatedCar = await this.carDetailsService.updateAvailability(
         id,
-        available,
-        available === false ? userId : null
+        false,
+        userId
+      );
+
+      return res.status(200).json(updatedCar);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Erro ao atualizar a disponibilidade do carro" });
+    }
+  }
+
+  async returnCar(req, res) {
+    try {
+      const { id } = req.params;
+
+      const userId = req.userInfo.id;
+
+      if (!userId) {
+        return res
+          .status(403)
+          .json({ message: "user não encontrado nos headers" });
+      }
+
+      const car = await this.carDetailsService.findById(id);
+
+      if (!car) {
+        return res.status(404).json({ message: "Carro não encontrado" });
+      }
+
+      const updatedCar = await this.carDetailsService.updateAvailability(
+        id,
+        true,
+        null
+      );
+
+      return res.status(200).json(updatedCar);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Erro ao atualizar a disponibilidade do carro" });
+    }
+  }
+
+  async cancelReservation(req, res) {
+    try {
+      const { id } = req.params;
+
+      const userId = req.userInfo.id;
+
+      if (!userId) {
+        return res
+          .status(403)
+          .json({ message: "user não encontrado nos headers" });
+      }
+
+      const car = await this.carDetailsService.findById(id);
+
+      if (!car) {
+        return res.status(404).json({ message: "Carro não encontrado" });
+      }
+
+      const updatedCar = await this.carDetailsService.updateAvailability(
+        id,
+        true,
+        userId
       );
 
       return res.status(200).json(updatedCar);
@@ -96,7 +154,7 @@ export default class CarDetailsController {
 
   async getReservedCars(req, res) {
     try {
-      const userId = req.headers.userid;
+      const userId = req.userInfo.id;
 
       if (!userId) {
         return res.status(403).json({ message: "Usuário não autenticado" });
@@ -131,6 +189,35 @@ export default class CarDetailsController {
       return res
         .status(500)
         .json({ message: "Erro ao recuperar carros reservados" });
+    }
+  }
+
+  async getMyReservations(req, res) {
+    try {
+      const userId = req.userInfo.id;
+
+      if (!userId) {
+        return res.status(403).json({ message: "Usuário não autenticado" });
+      }
+      
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      const cars = await db.CarDetails.findAll({
+        where: {
+          id: user.reservations,
+        },
+      });
+      
+      return res.status(200).json({ reservations: cars });
+    } catch (error) {
+      console.error("Erro ao obter reservas do usuário:", error);
+      return res
+        .status(500)
+        .json({ message: "Erro ao recuperar reservas do usuário" }); 
     }
   }
 }

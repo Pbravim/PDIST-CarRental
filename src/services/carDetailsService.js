@@ -27,29 +27,34 @@ export default class CarDetailsService {
         throw new Error("Carro não encontrado");
       }
 
-      car.available = available;
-      car.userId = available === false ? userId : null;
-      await car.save();
-
-      if (!available && userId) {
+      if(userId){
         const user = await this.userRepository.findOne({
           where: { id: userId },
         });
-
+           
         if (!user) {
           throw new Error("Usuário não encontrado");
         }
-
-        
+       
         if (!user.reservations) {
           user.reservations = [];
         }
-
         
-        user.reservations.push(car.id);
-        await user.save();
+        if (!available) {
+          user.reservations.push(car.id);
+          await user.save();     
+        } else {
+          const index = user.reservations.lastIndexOf(car.id)
+          if (index !== -1) {
+            user.reservations.splice(index, 1);
+          }
+          await user.save();
+        }
       }
 
+      car.available = available;
+      car.userId = available ? null :userId;
+      await car.save();
       return car;
     } catch (error) {
       console.error("Erro ao atualizar a disponibilidade:", error.message);

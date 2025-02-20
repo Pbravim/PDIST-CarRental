@@ -1,32 +1,23 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { generateTokenFromUuid } from "./jwt.js";
 
 dotenv.config();
 
 async function checkAuthentication(req) {
-    if (!req.headers.authorization) {
-        throw new Error("Authorization header is missing");
-    }
+  if (req.headers.authorization) {
+      const authHeader = req.headers.authorization.split(' ');
 
-    const authHeader = req.headers.authorization.split(" ");
+      if (!/^Bearer$/i.test(authHeader[0])) {
+          throw new Error('Invalid token');
+      }
 
-    if (authHeader.length !== 2 || authHeader[0].toLowerCase() !== "bearer") {
-        console.error("Token mal formatado ou ausente:", authHeader);
-        throw new Error("Invalid token format");
-    }
+      const token = authHeader[1];
+      const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET || '123');
 
-    const token = await generateTokenFromUuid(req);
-
-    try {
-        const secret = process.env.JWT_SECRET;
-        const tokenDecoded = jwt.verify(token, secret);
-        console.log("Token decodificado:", tokenDecoded);
-        return tokenDecoded;
-    } catch (error) {
-        console.error("Erro na verificação do token:", error.message);
-        throw new Error("Invalid token");
-    }
+      return tokenDecoded;
+  } else {
+      throw new Error('Invalid token');
+  }
 }
 
 async function authenticate(req, res, next) {
