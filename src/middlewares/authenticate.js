@@ -12,7 +12,7 @@ async function checkAuthentication(req) {
       }
 
       const token = authHeader[1];
-      const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET || '123');
+      const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET || 'CAT');
 
       return tokenDecoded;
   } else {
@@ -28,7 +28,7 @@ async function authenticate(req, res, next) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
-    req.user = authData; 
+    req.userInfo = authData; 
 
     next();
   } catch (error) {

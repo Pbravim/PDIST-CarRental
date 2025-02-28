@@ -43,10 +43,12 @@ export default (sequelize) => {
         timestamps: true, 
     });
 
-    User.hasMany(sequelize.models.CarDetails, {
-      foreignKey: "userId",
-      as: "reservations",
-    });
+    User.associate = (models) => {
+        User.hasMany(models.CarDetails, {
+            foreignKey: "userId",
+            as: "reservations",
+        });
+    }
 
     return User;
 };

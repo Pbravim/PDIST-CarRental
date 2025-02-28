@@ -56,7 +56,6 @@ export default class CarDetailsController {
   async rentCar(req, res) {
     try {
       const { id } = req.params;
-
       const userId = req.userInfo.id;
 
       if (!userId) {
@@ -200,17 +199,11 @@ export default class CarDetailsController {
         return res.status(403).json({ message: "Usuário não autenticado" });
       }
       
-      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const cars = await this.carDetailsRepository.findAll({ where: { userId: userId } });
       
-      if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
+      if (cars.length === 0) {
+        return res.status(404).json({ message: "Carros não encontrados" });
       }
-      
-      const cars = await db.CarDetails.findAll({
-        where: {
-          id: user.reservations,
-        },
-      });
       
       return res.status(200).json({ reservations: cars });
     } catch (error) {
