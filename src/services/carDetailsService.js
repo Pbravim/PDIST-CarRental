@@ -17,6 +17,10 @@ export default class CarDetailsService {
     return await this.carDetailsRepository.findOne(options);
   }
 
+  async findAllWithPagination(options) {
+    return await this.carDetailsRepository.findAllWithPagination(options);
+  }
+
   async updateAvailability(id, available, userId) {
     try {
       console.log(`Atualizando disponibilidade do carro com ID: ${id}`);

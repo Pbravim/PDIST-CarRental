@@ -8,26 +8,36 @@ export default class CarDetailsController {
 
   async findAll(req, res) {
     try {
-      const { make, model, year, fuel_type, available } = req.query;
-
+      const { make, model, year, fuel_type, available = true, page = 1, limit = 10  } = req.query;
       const options = { where: {} };
 
       if (make) options.where.make = { [Op.iLike]: `${make}%` };
       if (model) options.where.model = { [Op.iLike]: `${model}%` };
       if (year) options.where.year = Number(year);
       if (fuel_type) options.where.fuel_type = fuel_type;
-      if (available !== undefined)
-        options.where.available = available === "true";
+      if (available) options.where.available = available;
+      
+      options.limit = limit;
+      options.offset = (page - 1) * limit;
+      console.log(options)
 
-      console.log(options);
-
-      const carDetails = await this.carDetailsService.findAll(options);
+      const { rows: carDetails, count: total } = await this.carDetailsService.findAllWithPagination(options);
 
       if (carDetails.length === 0) {
         return res.status(404).json({ message: "Nenhum carro encontrado" });
       }
 
-      res.status(200).json(carDetails);
+      const totalPages = Math.ceil(total / limit);
+
+      res.status(200).json({
+        carDetails: carDetails,
+        pagination: {
+          total,
+          limit: limit,
+          page: page,
+          totalPages,
+        },
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erro ao buscar os carros" });
