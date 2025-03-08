@@ -24,6 +24,7 @@ export default class CarDetailsService {
   async updateAvailability(id, available, userId) {
     try {
       console.log(`Atualizando disponibilidade do carro com ID: ${id}`);
+      console.log(`usuário: ${userId}`)
 
       const car = await this.carDetailsRepository.findOne({ where: { id } });
 
@@ -44,16 +45,17 @@ export default class CarDetailsService {
           user.reservations = [];
         }
         
-        if (!available) {
-          user.reservations.push(car.id);
-          await user.save();     
-        } else {
-          const index = user.reservations.lastIndexOf(car.id)
-          if (index !== -1) {
-            user.reservations.splice(index, 1);
+        if (available) {
+          if (!user.reservations.includes(car.id)) {
+            user.reservations.push(car.id);
           }
-          await user.save();
+        } else {
+          user.reservations = user.reservations.filter(
+            (resId) => resId !== car.id
+          );
         }
+        await user.save();
+
       }
 
       car.available = available;

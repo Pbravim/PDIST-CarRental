@@ -209,7 +209,7 @@ export default class CarDetailsController {
         return res.status(403).json({ message: "Usuário não autenticado" });
       }
       
-      const cars = await this.carDetailsRepository.findAll({ where: { userId: userId } });
+      const cars = await this.carDetailsService.findAll({ where: { userId: userId } });
       
       if (cars.length === 0) {
         return res.status(404).json({ message: "Carros não encontrados" });
