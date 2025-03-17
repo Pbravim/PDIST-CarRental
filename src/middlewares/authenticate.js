@@ -3,6 +3,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+async function verifyToken(token) {
+  return jwt.verify(token, process.env.JWT_SECRET || 'CAT');
+}
+
 async function checkAuthentication(req) {
   if (req.headers.authorization) {
       const authHeader = req.headers.authorization.split(' ');
@@ -12,7 +16,7 @@ async function checkAuthentication(req) {
       }
 
       const token = authHeader[1];
-      const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET || 'CAT');
+      const tokenDecoded = verifyToken(token);
 
       return tokenDecoded;
   } else {
@@ -37,4 +41,4 @@ async function authenticate(req, res, next) {
   }
 }
 
-export { authenticate };
+export { authenticate, verifyToken };

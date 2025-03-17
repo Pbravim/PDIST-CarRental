@@ -80,6 +80,10 @@ export default class CarDetailsController {
         return res.status(404).json({ message: "Carro não encontrado" });
       }
 
+      if (!car.available) {
+        return res.status(400).json({ message: "Carro já está reservado" });
+      }
+
       const updatedCar = await this.carDetailsService.updateAvailability(
         id,
         false,

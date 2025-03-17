@@ -32,6 +32,10 @@ export default class CarDetailsService {
         throw new Error("Carro não encontrado");
       }
 
+      if (car.available === available) {
+        throw new Error("Carro já possui a mesma disponibilidade");
+      }
+
       if(userId){
         const user = await this.userRepository.findOne({
           where: { id: userId },
@@ -61,10 +65,10 @@ export default class CarDetailsService {
       car.available = available;
       car.userId = available ? null :userId;
       await car.save();
-      return car;
+      return { success: true, car };
     } catch (error) {
-      console.error("Erro ao atualizar a disponibilidade:", error.message);
-      throw new Error("Erro ao atualizar a disponibilidade");
+      console.error("Erro ao atualizar a disponibilidade:", error.message)
+      return { success: false, message: error.message }
     }
   }
 }
