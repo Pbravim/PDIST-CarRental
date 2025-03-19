@@ -21,12 +21,12 @@ export default class CarDetailsService {
     return await this.carDetailsRepository.findAllWithPagination(options);
   }
 
-  async updateAvailability(id, available, userId) {
+  async updateAvailability({carId, data_inicio, data_fim}, available, userId) {
     try {
-      console.log(`Atualizando disponibilidade do carro com ID: ${id}`);
+      console.log(`Atualizando disponibilidade do carro com ID: ${carId}`);
       console.log(`usuário: ${userId}`)
 
-      const car = await this.carDetailsRepository.findOne({ where: { id } });
+      const car = await this.carDetailsRepository.findOne({ where: { carId } });
 
       if (!car) {
         throw new Error("Carro não encontrado");
@@ -52,12 +52,17 @@ export default class CarDetailsService {
         if (available) {
           if (!user.reservations.includes(car.id)) {
             user.reservations.push(car.id);
+            car.data_inicio = data_inicio;
+            car.data_fim = data_fim;
           }
         } else {
           user.reservations = user.reservations.filter(
             (resId) => resId !== car.id
-          );
+          )
+          car.data_inicio = null;
+          car.data_fim = null;
         }
+        
         await user.save();
 
       }

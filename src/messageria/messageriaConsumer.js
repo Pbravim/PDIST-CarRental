@@ -14,13 +14,21 @@ const connectRabbitMQ = async () => {
     channel.consume(queue, async (msg) => {
       const reservationData = JSON.parse(msg.content.toString())
 
+      const {carId, data_inicio, data_fim, token} = reservationData
+
       console.log('Processando reserva:', reservationData)
 
       const carService = new CarDetailsService()
 
-      const jwtPayload = await verifyToken(reservationData.token)
+      const jwtPayload = await verifyToken(token)
 
-      const result = await carService.updateAvailability(reservationData.carId, false, jwtPayload.id)
+      const newReservationData = {
+        carId,
+        data_inicio,
+        data_fim
+      };
+
+      const result = await carService.updateAvailability(newReservationData, false, jwtPayload.id)
 
       if (result.success) {
         console.log('Reserva concluída:', result)
