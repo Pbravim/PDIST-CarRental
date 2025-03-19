@@ -8,13 +8,15 @@ export default class CarDetailsController {
 
   async findAll(req, res) {
     try {
-      const { make, model, year, fuel_type, available = true, page = 1, limit = 10  } = req.query;
+      console.log(req.query)
+      const { make, model, year, fuel, available = true, page = 1, limit = 10  } = req.query;
+      
       const options = { where: {} };
 
       if (make) options.where.make = { [Op.iLike]: `${make}%` };
       if (model) options.where.model = { [Op.iLike]: `${model}%` };
       if (year) options.where.year = Number(year);
-      if (fuel_type) options.where.fuel_type = fuel_type;
+      if (fuel) options.where.fuel_type = fuel.toLowerCase();
       if (available) options.where.available = available;
       
       options.limit = limit;
@@ -22,10 +24,6 @@ export default class CarDetailsController {
       console.log(options)
 
       const { rows: carDetails, count: total } = await this.carDetailsService.findAllWithPagination(options);
-
-      if (carDetails.length === 0) {
-        return res.status(404).json({ message: "Nenhum carro encontrado" });
-      }
 
       const totalPages = Math.ceil(total / limit);
 
