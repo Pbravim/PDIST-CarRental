@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 async function verifyToken(token) {
-  return jwt.verify(token, process.env.JWT_SECRET || 'CAT');
+  return await jwt.verify(token, process.env.JWT_SECRET || 'CAT');
 }
 
 async function checkAuthentication(req) {
