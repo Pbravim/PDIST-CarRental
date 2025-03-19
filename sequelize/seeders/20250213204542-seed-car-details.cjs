@@ -8,14 +8,17 @@ module.exports = {
     const filePath = path.join(__dirname, './car_data.json');
     const carData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
-    const carsWithTimestamps = carData.map(car => ({
+    const carsWithoutPrice = carData.map(({ price, daily_rental_price, ...car }) => ({
       ...car,
+      preco_diario: daily_rental_price,
       createdAt: new Date(),
       updatedAt: new Date()
     }));
-    console.log(carsWithTimestamps);
     
-    return queryInterface.bulkInsert('car_details', carsWithTimestamps);
+    console.log(carsWithoutPrice);
+    
+
+    return queryInterface.bulkInsert('car_details', carsWithoutPrice);
   },
 
   down: async (queryInterface, Sequelize) => {
