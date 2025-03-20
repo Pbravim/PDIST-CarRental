@@ -149,7 +149,7 @@ export default class CarDetailsController {
       }
 
       const updatedCar = await this.carDetailsService.updateAvailability(
-        id,
+        {carId: id},
         true,
         userId
       );
