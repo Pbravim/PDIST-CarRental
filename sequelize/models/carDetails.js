@@ -70,6 +70,18 @@ export default (sequelize) => {
           key: 'id',
         },
       },
+      preco_diario: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      data_inicio: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      data_fim: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      }
     },
     {
       sequelize,

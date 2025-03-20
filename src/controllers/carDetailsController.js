@@ -187,12 +187,7 @@ export default class CarDetailsController {
         where: { userId: userId },
       });
 
-      
-      if (reservedCars.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Nenhum carro reservado encontrado" });
-      }
+      console.log(reservedCars)
 
       return res.status(200).json(reservedCars);
     } catch (error) {
@@ -210,12 +205,9 @@ export default class CarDetailsController {
       if (!userId) {
         return res.status(403).json({ message: "Usuário não autenticado" });
       }
-      
+      console.log(userId)
       const cars = await this.carDetailsService.findAll({ where: { userId: userId } });
       
-      if (cars.length === 0) {
-        return res.status(404).json({ message: "Carros não encontrados" });
-      }
       
       return res.status(200).json({ reservations: cars });
     } catch (error) {

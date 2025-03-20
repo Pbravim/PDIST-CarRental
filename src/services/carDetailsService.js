@@ -26,7 +26,7 @@ export default class CarDetailsService {
       console.log(`Atualizando disponibilidade do carro com ID: ${carId}`);
       console.log(`usuário: ${userId}`)
 
-      const car = await this.carDetailsRepository.findOne({ where: { carId } });
+      const car = await this.carDetailsRepository.findOne({ where: { id: carId } });
 
       if (!car) {
         throw new Error("Carro não encontrado");
@@ -49,26 +49,21 @@ export default class CarDetailsService {
           user.reservations = [];
         }
         
-        if (available) {
-          if (!user.reservations.includes(car.id)) {
-            user.reservations.push(car.id);
-            car.data_inicio = data_inicio;
-            car.data_fim = data_fim;
-          }
+        if (!available) {
+          user.reservations.push(car.id);
         } else {
-          user.reservations = user.reservations.filter(
-            (resId) => resId !== car.id
-          )
-          car.data_inicio = null;
-          car.data_fim = null;
+          const index = user.reservations.lastIndexOf(car.id)
+          if (index !== -1) {
+            user.reservations.splice(index, 1);
+          }
         }
-        
-        await user.save();
-
+      await user.save();
       }
 
       car.available = available;
       car.userId = available ? null :userId;
+      car.data_inicio = !available ? data_inicio : null;
+      car.data_fim =  !available ? data_fim : null;
       await car.save();
       return { success: true, car };
     } catch (error) {
